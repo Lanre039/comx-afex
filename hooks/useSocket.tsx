@@ -27,7 +27,6 @@ const useSocket = () => {
         data = encryption.decrypt(data);
         const wallets = encryption.decrypt(data?.wallets);
         data = { ...data, wallets };
-        console.log({ dddd: data });
         setClientPositions(data);
       }
     };
@@ -39,8 +38,6 @@ const useSocket = () => {
           encryption.decrypt(message)
         );
         data = { ...data, messages: message };
-        console.log({ dddd: data });
-
         setOrders(data);
       }
     };
