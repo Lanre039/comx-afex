@@ -8,6 +8,9 @@ const useSocket = () => {
   const [orders, setOrders] = useState<Record<string, any>>({});
 
   useEffect(() => {
+    const test = encryption.decrypt("UeFth9EF5b5o1zMlVc9Z4w==");
+    console.log({ test });
+
     fetchData();
   }, []);
 
@@ -32,13 +35,11 @@ const useSocket = () => {
     tradeOrderSocket.onmessage = (res) => {
       if (res.data) {
         let data = JSON.parse(res.data);
-        encryption.decrypt(data);
-        encryption.decrypt(data?.messages);
-        data?.messages.forEach((message: any) => {
-          encryption.decrypt(message);
-          encryption.decrypt(message?.client);
-          encryption.decrypt(message?.client?.client_settings);
-        });
+        data = encryption.decrypt(data);
+        const message = data?.messages.map((message: any) =>
+          encryption.decrypt(message)
+        );
+        data = { ...data, messages: message };
         setOrders(data);
       }
     };
