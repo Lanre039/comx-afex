@@ -4,9 +4,8 @@ import {
   UnstyledButton,
   Group,
   Text,
-  Center,
-  Skeleton,
   ScrollArea,
+  Skeleton,
 } from "@mantine/core";
 import { useState } from "react";
 
@@ -14,14 +13,17 @@ const useStyles = createStyles((theme) => ({
   th: {
     padding: "0 !important",
     borderBottom: "2px solid #F2F4F6 !important",
+    // width: "100%",
   },
 
   td: {
     border: "none !important",
     padding: "0 !important",
+    // width: "100%",
   },
 
   tr: {
+    // width: "100%",
     borderBottom: "2px solid #F2F4F6",
     padding: `${theme.spacing.xs}px ${theme.spacing.xl}px !important`,
     fontWeight: 500,
@@ -83,32 +85,20 @@ interface IColumn {
 interface TableSortProps {
   data: Record<string, any>[];
   column: IColumn[];
-  sortedData: Record<string, any>[];
-  setSorting?: (val: keyof Record<string, any>) => void;
-  sortBy?: keyof Record<string, any> | null;
-  reverseSortDirection?: boolean;
   isLoading?: boolean;
   height?: string;
 }
 
 interface ThProps {
   children: React.ReactNode;
-  reversed: boolean;
-  sorted: boolean;
-  showSort: boolean;
-  onSort(): void;
 }
 
-function Th({ children, reversed, sorted, onSort, showSort }: ThProps) {
+function Th({ children }: ThProps) {
   const { classes } = useStyles();
-  // const Icon = sorted
-  //   ? reversed
-  //     ? BiChevronUp
-  //     : BiChevronDown
-  //   : HiOutlineSelector;
+
   return (
     <th className={classes.th}>
-      <UnstyledButton onClick={onSort} className={classes.control}>
+      <UnstyledButton className={classes.control}>
         <Group position="apart">
           <Text
             weight={500}
@@ -117,27 +107,13 @@ function Th({ children, reversed, sorted, onSort, showSort }: ThProps) {
           >
             {children}
           </Text>
-          {/* {showSort && (
-              <Center className={classes.icon}>
-                <Icon size={14} />
-              </Center>
-            )} */}
         </Group>
       </UnstyledButton>
     </th>
   );
 }
 
-function Table({
-  data,
-  height,
-  column,
-  sortBy,
-  reverseSortDirection,
-  sortedData,
-  setSorting,
-  isLoading,
-}: TableSortProps) {
+function Table({ data, height, column, isLoading }: TableSortProps) {
   const [scrolled, setScrolled] = useState(false);
   const { classes, cx } = useStyles();
 
@@ -152,11 +128,11 @@ function Table({
   );
 
   const renderRows = () => {
-    if (sortedData.length === 0) {
+    if (data.length === 0) {
       return <EmptyState />;
     }
 
-    return sortedData.map((row, i) => (
+    return data.map((row, i) => (
       <tr key={i} className={classes.tr}>
         {column.map((col) => {
           if (col.Cell)
@@ -198,24 +174,13 @@ function Table({
         sx={{
           border: "1px solid #DEE2E6",
           borderRadius: "10px",
+          width: "100%",
         }}
       >
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
             {column.map((i, idx) => (
-              <Th
-                key={idx}
-                showSort={i.sort ?? false}
-                sorted={sortBy === i.accessor}
-                reversed={reverseSortDirection ?? false}
-                onSort={() => {
-                  if (i.sort) {
-                    setSorting?.(i.accessor as any);
-                  }
-                }}
-              >
-                {i.name}
-              </Th>
+              <Th key={idx}>{i.name}</Th>
             ))}
           </tr>
         </thead>

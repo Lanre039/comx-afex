@@ -1,8 +1,13 @@
 import "../styles/globals.css";
+import { useState } from "react";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Roboto } from "@next/font/google";
-import { MantineProvider } from "@mantine/core";
+import {
+  ColorScheme,
+  ColorSchemeProvider,
+  MantineProvider,
+} from "@mantine/core";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700"],
@@ -11,13 +16,12 @@ const roboto = Roboto({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+  const toggleColorScheme = (value?: ColorScheme) =>
+    setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
+
   return (
     <>
-      {/* <style jsx global>{`
-        html {
-          font-family: ${roboto.style.fontFamily};
-        }
-      `}</style> */}
       <Head>
         <title>ComX</title>
         <meta
@@ -25,21 +29,25 @@ export default function App({ Component, pageProps }: AppProps) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          /** Put your mantine theme override here */
-          // colorScheme: "dark",
-          globalStyles: (theme) => ({
-            body: {
-              fontFamily: roboto.style.fontFamily,
-            },
-          }),
-        }}
+      <ColorSchemeProvider
+        colorScheme={colorScheme}
+        toggleColorScheme={toggleColorScheme}
       >
-        <Component {...pageProps} />
-      </MantineProvider>
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{
+            colorScheme,
+            globalStyles: (theme) => ({
+              body: {
+                fontFamily: roboto.style.fontFamily,
+              },
+            }),
+          }}
+        >
+          <Component {...pageProps} />
+        </MantineProvider>
+      </ColorSchemeProvider>
     </>
   );
 }

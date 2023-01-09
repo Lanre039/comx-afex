@@ -1,7 +1,8 @@
 import Image from "next/image";
-import styles from "../styles/Home.module.css";
 import { ArrowDown2, ArrowRight2, Sun1 } from "iconsax-react";
-import { Box, Text, Divider, Switch, Menu } from "@mantine/core";
+import { Box, Text, Switch, Menu, useMantineTheme } from "@mantine/core";
+import styles from "../styles/Home.module.css";
+import { formatCurrency } from "../utils";
 
 const CustomMenu = () => {
   return (
@@ -16,7 +17,6 @@ const CustomMenu = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {/* <Menu.Label>List</Menu.Label> */}
         <Menu.Item>Demo</Menu.Item>
       </Menu.Dropdown>
     </Menu>
@@ -24,13 +24,20 @@ const CustomMenu = () => {
 };
 
 interface IProps {
+  data: {
+    availableBalance: string;
+    loanBalance: string;
+    securityBalance: string;
+  };
   theme: Record<string, any>;
   checked: boolean;
   setChecked: (args: boolean) => void;
 }
 
 const Nav = (props: IProps) => {
-  const { theme, checked, setChecked } = props;
+  const mantineTheme = useMantineTheme();
+  const { data, theme, checked, setChecked } = props;
+  const { colorScheme, toggleColorScheme } = theme;
 
   return (
     <section className={styles.nav}>
@@ -38,37 +45,36 @@ const Nav = (props: IProps) => {
         <Image
           src="/images/logo.png"
           alt="ComX Logo"
-          // className={styles.vercelLogo}
           width={112.84}
           height={59}
           priority
         />
         <div>
-          {/* <Text className="bg-[red]">Label</Text> */}
-          <Divider color="blue" orientation="vertical" />
           <Switch
             checked={checked}
-            onChange={(event) => setChecked(event.currentTarget.checked)}
-            // color={checked ? "#F4F4F6" : "dark"}
-            // color={
-            //   checked ? theme.colors.gray[theme.fn.primaryShade()] : "#F4F4F6"
-            // }
-            color="black"
+            onChange={(event) => {
+              toggleColorScheme();
+              setChecked(event.currentTarget.checked);
+            }}
+            color={colorScheme == "light" ? "#f4f4f6" : "black"}
             size="md"
-            onLabel="LIGHT"
-            offLabel="DARK"
+            onLabel={<h5 className="text-black">LIGHT</h5>}
+            offLabel={<h5 className="text-white">DARK</h5>}
             thumbIcon={
               checked ? (
                 <Sun1
                   size="12"
-                  color={theme.colors.dark[theme.fn.primaryShade()]}
+                  color={
+                    mantineTheme.colors.dark[mantineTheme.fn.primaryShade()]
+                  }
                   stroke="3"
                 />
               ) : (
                 <Sun1
                   size="12"
-                  color={theme.colors.dark[theme.fn.primaryShade()]}
-                  // color={theme.colors.teal[theme.fn.primaryShade()]}
+                  color={
+                    mantineTheme.colors.dark[mantineTheme.fn.primaryShade()]
+                  }
                   stroke="3"
                 />
               )
@@ -82,16 +88,25 @@ const Nav = (props: IProps) => {
             <ArrowRight2 size="16" color="#000" />
             <div className="ml-5">
               <p className={styles.navHeading}>CASH BALANCE</p>
-              <h3 className={styles.navSubHeading}>₦8,374,763</h3>
+              {/* <h3 className={styles.navSubHeading}>₦8,374,763</h3> */}
+              <h3 className={styles.navSubHeading}>
+                ₦{formatCurrency(Number(data?.availableBalance))}
+              </h3>
             </div>
           </div>
           <div>
             <p className={styles.navHeading}>SECURITIES VALUE</p>
-            <h3 className={styles.navSubHeading}>₦8,374,763</h3>
+            {/* <h3 className={styles.navSubHeading}>₦8,374,763</h3> */}
+            <h3 className={styles.navSubHeading}>
+              ₦{formatCurrency(Number(data?.securityBalance))}
+            </h3>
           </div>
           <div>
             <p className={styles.navHeading}>LOAN BALANCE</p>
-            <h3 className={styles.navSubHeading}>₦8,374,763</h3>
+            {/* <h3 className={styles.navSubHeading}>₦8,374,763</h3> */}
+            <h3 className={styles.navSubHeading}>
+              ₦{formatCurrency(Number(data?.loanBalance))}
+            </h3>
           </div>
         </div>
         <div className="ml-10">

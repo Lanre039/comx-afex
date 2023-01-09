@@ -1,7 +1,7 @@
 import { Input } from "@mantine/core";
 import { useState } from "react";
-import * as Svg from "./Svgpack";
 import { SearchNormal1 } from "iconsax-react";
+import * as Svg from "./Svgpack";
 
 const SideBar = () => {
   const [active, setActive] = useState(iconList[1].name);
