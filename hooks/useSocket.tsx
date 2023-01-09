@@ -8,9 +8,6 @@ const useSocket = () => {
   const [orders, setOrders] = useState<Record<string, any>>({});
 
   useEffect(() => {
-    const test = encryption.decrypt("UeFth9EF5b5o1zMlVc9Z4w==");
-    console.log({ test });
-
     fetchData();
   }, []);
 
@@ -27,8 +24,10 @@ const useSocket = () => {
     clientPositionSocket.onmessage = (res) => {
       if (res.data) {
         let data = JSON.parse(res.data);
-        encryption.decrypt(data);
-        encryption.decrypt(data?.wallets);
+        data = encryption.decrypt(data);
+        const wallets = encryption.decrypt(data?.wallets);
+        data = { ...data, wallets };
+        console.log({ dddd: data });
         setClientPositions(data);
       }
     };
@@ -40,6 +39,8 @@ const useSocket = () => {
           encryption.decrypt(message)
         );
         data = { ...data, messages: message };
+        console.log({ dddd: data });
+
         setOrders(data);
       }
     };
