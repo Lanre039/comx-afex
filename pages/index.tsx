@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { nanoid } from "nanoid";
 import { useMantineColorScheme } from "@mantine/core";
 import styles from "../styles/Home.module.css";
@@ -16,17 +16,54 @@ export default function Home() {
   const { clientPositions, orders } = useSocket();
   const [activeBoard, setActiveBoard] = useState(model.board[0]);
   const [activeProduct, setActiveProduct] = useState(model.products[0]);
-  console.log({ clientPositions, orders });
+
+  const data = useMemo(() => {
+    return {
+      buy: Array.isArray(orders?.messages)
+        ? orders?.messages.filter((item) => item.order_type === "Buy")
+        : [],
+      sell: Array.isArray(orders?.messages)
+        ? orders?.messages.filter((item) => item.order_type === "Sell")
+        : [],
+    };
+  }, [orders]);
+
+  const [boards, products] = useMemo(() => {
+    let tempA: any = {};
+    let tempB: any = {};
+    const messages = Array.isArray(orders?.messages) ? orders?.messages : [];
+    messages.forEach((message) => {
+      if (!tempA[message.board_type]) tempA[message.board_type] = true;
+      if (!tempB[message.security_code]) tempB[message.security_code] = true;
+    });
+    tempA = Object.keys(tempA);
+    tempB = ["All", ...Object.keys(tempB)];
+    setActiveBoard(tempA[0]);
+    setActiveProduct(tempB[0]);
+    return [tempA, tempB];
+  }, [orders]);
+
+  const [buy, sell] = useMemo(() => {
+    let newBuy = data.buy;
+    let newSell = data.sell;
+    newBuy = newBuy.filter((item) => item.board_type === activeBoard);
+    newSell = newSell.filter((item) => item.board_type === activeBoard);
+    if (activeProduct !== "All") {
+      newBuy = newBuy.filter((item) => item.security_code === activeProduct);
+      newSell = newSell.filter((item) => item.security_code === activeProduct);
+    }
+    return [newBuy, newSell];
+  }, [data, activeBoard, activeProduct]);
 
   const buyOrderColumn = [
     ...model.orderColumn,
     {
       id: nanoid(),
       name: "Bid Price",
-      accessor: "position",
+      accessor: "order_price",
       Cell: (data: any) => (
-        <div className="w-fit flex items-center">
-          <p className="mr-5 text-[#52965E]">{data?.position}</p>
+        <div className="w-full max-w-[160px] flex justify-between items-center">
+          <p className=" text-[#52965E]">{data?.order_price}</p>
           <p className={styles.buyBtn}>Buy</p>
         </div>
       ),
@@ -39,8 +76,8 @@ export default function Home() {
       name: "Bid Price",
       accessor: "order_price",
       Cell: (data: any) => (
-        <div className="w-fit flex  items-center">
-          <p className="mr-5 text-[#E55541]">{data?.position}</p>
+        <div className="w-full max-w-[160px] flex justify-between items-center">
+          <p className="text-[#E55541]">{data?.order_price}</p>
           <p className={styles.sellBtn}>Sell</p>
         </div>
       ),
@@ -62,7 +99,8 @@ export default function Home() {
                 <h3 className="text-sm font-medium text-[#1E1E1E] ml-4">
                   Board
                 </h3>
-                {model.board.map((item) => (
+                {/* {model.board.map((item) => ( */}
+                {boards.map((item: any) => (
                   <h3
                     key={Math.random()}
                     className={`rounded-[18px] text-sm font-medium py-3 px-5 mx-3 cursor-pointer ${
@@ -78,7 +116,8 @@ export default function Home() {
               </div>
               <div className="h-fit flex items-center">
                 <h3 className="text-sm font-medium text-[#1E1E1E]">Products</h3>
-                {model.products.map((item) => (
+                {/* {model.products.map((item) => ( */}
+                {products.map((item: any) => (
                   <h3
                     key={Math.random()}
                     className={`rounded-[18px] text-sm font-medium  py-3 px-5 mx-3 cursor-pointer ${
@@ -96,10 +135,12 @@ export default function Home() {
             <div className="mt-2 mx-2">
               <div className="flex">
                 <div className="bg-white w-full mr-2">
-                  <Table data={model.newData} column={buyOrderColumn} />
+                  {/* <Table data={data.buy} column={buyOrderColumn} /> */}
+                  <Table data={buy} column={buyOrderColumn} />
                 </div>
                 <div className="bg-white w-full">
-                  <Table data={model.newData} column={sellOrderColumn} />
+                  {/* <Table data={data.sell} column={sellOrderColumn} /> */}
+                  <Table data={sell} column={sellOrderColumn} />
                 </div>
               </div>
             </div>

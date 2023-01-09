@@ -16,12 +16,12 @@ export const orderColumn = [
   {
     id: nanoid(),
     name: "Products",
-    accessor: "mass",
+    accessor: "security_code",
   },
   {
     id: nanoid(),
     name: "Quantity",
-    accessor: "atomic",
+    accessor: "matched_qty",
   },
 ];
 

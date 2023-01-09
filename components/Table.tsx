@@ -13,17 +13,14 @@ const useStyles = createStyles((theme) => ({
   th: {
     padding: "0 !important",
     borderBottom: "2px solid #F2F4F6 !important",
-    // width: "100%",
   },
 
   td: {
     border: "none !important",
     padding: "0 !important",
-    // width: "100%",
   },
 
   tr: {
-    // width: "100%",
     borderBottom: "2px solid #F2F4F6",
     padding: `${theme.spacing.xs}px ${theme.spacing.xl}px !important`,
     fontWeight: 500,
